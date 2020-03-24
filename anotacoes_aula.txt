@@ -1,0 +1,6 @@
+Anotações
+
+Arquivos de imagens e fonte:
+site: bit.do/tasksassets
+http://files.cod3r.com.br/curso-react-native/assets.zip
+
