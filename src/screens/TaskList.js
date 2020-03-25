@@ -4,18 +4,51 @@ import {
     View,
     Text,
     ImageBackground,
-    StyleSheet
+    StyleSheet,
+    FlatList
 } from 'react-native'
+
+//imports third components
 import momemt from 'moment'
 import 'moment/locale/pt-br'
 
 //imports components
+import Task from '../components/Task'
 
 //imports styles and images and fonts
 import commonStyles from '../styles/commonStyles'
 import todayImage from '../../assets/imgs/today.jpg'
 
 export default class TaskList extends Component {
+
+    state = {
+        tasks: [{
+            id: Math.random(),
+            desc: 'Comprar Livro de JavaScript',
+            estimateAt: new Date(),
+            doneAt: new Date()
+        }, {
+            id: Math.random(),
+            desc: 'Ler Livro de JavaScript',
+            estimateAt: new Date(),
+            doneAt: null
+        }]
+    }
+
+    //funcao marcar como concluida ou deixar em aberto
+    toggleTask = taskId => {
+        const tasks = [...this.state.tasks]
+        tasks.forEach(task => {
+            if (task.id === taskId) {
+                task.doneAt = task.doneAt ? null : new Date()
+            }
+        })
+
+        this.setState({
+            tasks
+        })
+    }
+
     render() {
         const today = momemt().locale('pt-br').format('ddd, D [de] MMMM')
         return(
@@ -30,9 +63,11 @@ export default class TaskList extends Component {
                     </View>
                 </ImageBackground>
                 <View style={styles.taskList}>
-                    <Text>Tarafa #01</Text>
-                    <Text>Tarafa #02</Text>
-                    <Text>Tarafa #03</Text>
+                    <FlatList
+                        data={this.state.tasks}
+                        keyExtractor={item => `${item.id}`}
+                        renderItem={({item}) => <Task {...item} toggleTask={this.toggleTask}/>}
+                    />
                 </View>
             </View>
         )
