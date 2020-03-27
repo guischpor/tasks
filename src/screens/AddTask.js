@@ -20,7 +20,6 @@ export default class AddTask extends Component {
                     onPress={this.props.onCancel}
                 >
                     <View style={styles.overlay}>
-
                     </View>
                 </TouchableWithoutFeedback>
             </Modal>
