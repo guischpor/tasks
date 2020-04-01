@@ -45,3 +45,9 @@ para criar e linkar os assets do projeto
 
 Agora digite para ele linkar os assets do projeto:
 -- npx react-native link
+
+----------------------------------------
+Configuração do projeto para IOS pod install
+
+Use o comando
+-- pod install
