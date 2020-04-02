@@ -9,13 +9,20 @@ import {
     TextInput
 } from 'react-native'
 import commonStyles from '../styles/commonStyles'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
-const initialState = {desc: ''}
+const initialState = {desc: '', date: new Date()}
 
 export default class AddTask extends Component {
 
     state={
         ...initialState
+    }
+
+    getDatePicker = () => {
+        let datePicker =  <DateTimePicker value={this.state.date}
+            onChange={(_, date) => this.setState({date})}
+            mode='date' />
     }
 
     render() {
@@ -39,6 +46,7 @@ export default class AddTask extends Component {
                         value={this.state.desc}
                         onChangeText={desc => this.setState({desc})}
                     />
+                    {this.getDatePicker()}
                     <View style={styles.buttons}>
                         <TouchableOpacity onPress={this.props.onCancel}>
                             <Text style={styles.button}>Cancelar</Text>
