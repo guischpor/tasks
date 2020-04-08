@@ -4,9 +4,11 @@ import {
     View,
     Text,
     StyleSheet,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    TouchableOpacity,
+
 } from 'react-native'
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Swipeable from 'react-native-gesture-handler/Swipeable'
 
 //imports third components
 import moment from 'moment'
@@ -15,6 +17,7 @@ import 'moment/locale/pt-br'
 //imports components
 
 //imports styles and images and fonts
+import Icon from 'react-native-vector-icons/FontAwesome'
 import commonStyles from '../styles/commonStyles'
 
 export default props => {
@@ -28,23 +31,48 @@ export default props => {
     const formattedDate = moment(date).locale('pt-br')
         .format('ddd, D [de] MMMM')
 
-    return (
-        <View style={styles.container}>
-            <TouchableWithoutFeedback
-                onPress={() => props.toggleTask(props.id)}
-            >
-                <View style={styles.checkContainer}>
-                    {getCheckView(props.doneAt)}
-                </View>
-            </TouchableWithoutFeedback>
-            <View>
-                <Text style={[styles.desc, doneOrNotStyle]}>
-                    {props.desc}
-                </Text>
-                <Text style={styles.date}>{formattedDate}</Text>
-            </View>
+    //metodo swipe lado direito
+    const getRightContent = () => {
+        return (
+            <TouchableOpacity
+                style={styles.right}
+                onPress={() => props.onDelete && props.onDelete(props.id)}>
+                <Icon name='trash' size={30} color='#fff' />
+            </TouchableOpacity>
+        )
+    }
 
-        </View>
+    //metodo swipe lado esquerdo
+    const getLeftContent = () => {
+        return (
+            <View style={styles.left}>
+                <Icon name='trash' size={20} color='#fff' style={styles.excludeIcon}/>
+                <Text style={styles.excludeText}>Excluir</Text>
+            </View>
+        )
+    }
+
+    return (
+        <Swipeable
+            renderRightActions={getRightContent}
+            renderLeftActions={getLeftContent}
+            onSwipeableLeftOpen={() => props.onDelete && props.onDelete(props.id)}>
+            <View style={styles.container}>
+                <TouchableWithoutFeedback
+                    onPress={() => props.onToggleTask(props.id)}
+                >
+                    <View style={styles.checkContainer}>
+                        {getCheckView(props.doneAt)}
+                    </View>
+                </TouchableWithoutFeedback>
+                <View>
+                    <Text style={[styles.desc, doneOrNotStyle]}>
+                        {props.desc}
+                    </Text>
+                    <Text style={styles.date}>{formattedDate}</Text>
+                </View>
+            </View>
+        </Swipeable>
     )
 }
 
@@ -53,12 +81,7 @@ function getCheckView(doneAt) {
     if (doneAt != null) {
         return (
             <View style={styles.done}>
-                <Icon
-                    name='check'
-                    size={20}
-                    color='#fff'
-                >
-                </Icon>
+                <Icon name='check' size={20} color='#fff' />
             </View>
         )
     } else {
@@ -77,6 +100,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         alignItems: 'center',
         paddingVertical: 10,
+        backgroundColor: '#fff'
     },
     checkContainer: {
         width: '20%',
@@ -107,6 +131,27 @@ const styles = StyleSheet.create({
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.subText,
         fontSize: 12
-
+    },
+    right: {
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        paddingHorizontal: 20
+    },
+    left: {
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1
+    },
+    excludeIcon: {
+        marginLeft: 10
+    },
+    excludeText: {
+        fontFamily: commonStyles.fontFamily,
+        color: '#fff',
+        fontSize: 20,
+        margin: 10
     },
 })

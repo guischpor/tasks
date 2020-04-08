@@ -51,3 +51,8 @@ Configuração do projeto para IOS pod install
 
 Use o comando
 -- pod install
+
+----------------------------------------
+Configurando o swipeable para funcionar no android
+
+https://stackoverflow.com/questions/57428224/react-native-gesture-handler-swipeable-is-not-working-on-android

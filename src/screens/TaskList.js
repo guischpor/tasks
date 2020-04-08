@@ -7,8 +7,10 @@ import {
     StyleSheet,
     FlatList,
     TouchableOpacity,
-    Platform
+    Platform,
+    Alert
 } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage'
 
 //imports third components
 import momemt from 'moment'
@@ -23,33 +25,61 @@ import AddTask from './AddTask'
 import commonStyles from '../styles/commonStyles'
 import todayImage from '../../assets/imgs/today.jpg'
 
+const initialState = {
+    showDoneTasks: true,
+    showAddTask: false,
+    visibleTasks: [],
+    tasks: [],
+}
+
 export default class TaskList extends Component {
 
     state = {
-        showDoneTasks: true,
-        showAddTask: false,
-        visibleTasks: [],
-        tasks: [{
-            id: Math.random(),
-            desc: 'Comprar Livro de JavaScript',
-            estimateAt: new Date(),
-            doneAt: new Date()
-        }, {
-            id: Math.random(),
-            desc: 'Ler Livro de JavaScript',
-            estimateAt: new Date(),
-            doneAt: null
-        }]
+     ...initialState,
+        // tasks: [{
+        //     id: Math.random(),
+        //     desc: 'Comprar Livro de JavaScript',
+        //     estimateAt: new Date(),
+        //     doneAt: new Date()
+        // }, {
+        //     id: Math.random(),
+        //     desc: 'Ler Livro de JavaScript',
+        //     estimateAt: new Date(),
+        //     doneAt: null
+        // }]
     }
 
-    componentDidMount = () => {
-        this.filterTasks()
+    componentDidMount = async () => {
+        const stateString = await AsyncStorage.getItem('tasksState')
+        const state = JSON.parse(stateString) || initialState
+        this.setState(state, this.filterTasks)
     }
 
     //funcao que filtra as atividades concluidas ou não
     toggleFilter = () => {
         this.setState({
             showDoneTasks: !this.state.showDoneTasks
+        }, this.filterTasks)
+    }
+
+    //funcao adiciona a nova atividade no array ou banco de dados
+    addTask = newTask => {
+        if (!newTask.desc || !newTask.desc.trim()) {
+            Alert.alert("Dados Inválidos", "Descrição não informada!")
+            return
+        }
+
+        const tasks = [...this.state.tasks]
+        tasks.push({
+            id: Math.random(),
+            desc: newTask.desc,
+            estimateAt: newTask.date,
+            doneAt: null
+        })
+
+        this.setState({
+            tasks,
+            showAddTask: false
         }, this.filterTasks)
     }
 
@@ -66,6 +96,8 @@ export default class TaskList extends Component {
         this.setState({
             visibleTasks
         })
+
+        AsyncStorage.setItem('tasksState', JSON.stringify(this.state))
     }
 
     //funcao marcar como concluida ou deixar em aberto
@@ -82,6 +114,14 @@ export default class TaskList extends Component {
         }, this.filterTasks)
     }
 
+    //funcao que delete a task
+    deleTask = id => {
+        const tasks = this.state.tasks.filter(task => task.id !== id)
+        this.setState({
+            tasks
+        }, this.filterTasks)
+    }
+
     render() {
         const today = momemt().locale('pt-br').format('ddd, D [de] MMMM')
         return(
@@ -89,6 +129,7 @@ export default class TaskList extends Component {
                 <AddTask
                     isVisible={this.state.showAddTask}
                     onCancel={() => this.setState({ showAddTask: false })}
+                    onSave={this.addTask}
                 />
                 <ImageBackground
                     source={todayImage}
@@ -112,7 +153,7 @@ export default class TaskList extends Component {
                     <FlatList
                         data={this.state.visibleTasks}
                         keyExtractor={item => `${item.id}`}
-                        renderItem={({item}) => <Task {...item} toggleTask={this.toggleTask}/>}
+                        renderItem={({item}) => <Task {...item} onToggleTask={this.toggleTask} onDelete={this.deleTask} />}
                     />
                 </View>
                 <TouchableOpacity
