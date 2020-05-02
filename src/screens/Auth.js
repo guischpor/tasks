@@ -5,13 +5,12 @@ import {
     Text,
     StyleSheet,
     ImageBackground,
-    TextInput,
     TouchableHighlight,
-    Platform,
     Alert
 } from 'react-native'
 
 //imports components
+import AuthInput from '../components/AuthInput'
 
 //imports images, styles and icons
 import commonStyles from '../styles/commonStyles'
@@ -49,22 +48,24 @@ export default class Auth extends Component {
                     </Text>
 
                     {this.state.stageNew &&
-                        <TextInput
-                            placeholder='Nome'
+                        <AuthInput
+                            icon='user'
                             value={this.state.name}
                             onChangeText={name => this.setState({name})}
                             style={styles.input}
                         />
                     }
 
-                    <TextInput
+                    <AuthInput
+                        icon='at'
                         placeholder='E-mail'
                         value={this.state.email}
                         onChangeText={email => this.setState({email})}
                         style={styles.input}
                     />
 
-                    <TextInput
+                    <AuthInput
+                        icon='lock'
                         placeholder='Senha'
                         value={this.state.password}
                         onChangeText={password => this.setState({password})}
@@ -73,7 +74,8 @@ export default class Auth extends Component {
                     />
 
                     {this.state.stageNew &&
-                        <TextInput
+                        <AuthInput
+                            icon='asterisk'
                             placeholder='Confirmação de Senha'
                             value={this.state.confirmPassword}
                             onChangeText={confirmPassword => this.setState({confirmPassword})}
@@ -116,32 +118,32 @@ const styles = StyleSheet.create({
         fontSize: 70,
         marginBottom: 10
     },
-    subTitle: {
+    subtitle: {
         fontFamily: commonStyles.fontFamily,
-        color: '#fff',
+        color: '#FFF',
         fontSize: 20,
         textAlign: 'center',
         marginBottom: 10
     },
-    formContainer:{
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    formContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
         padding: 20,
         width: '90%'
     },
     input: {
-        margin: 10,
-        backgroundColor: '#fff',
-        padding: Platform.OS == 'ios' ? 15 : 10,
+        marginTop: 10,
+        backgroundColor: '#FFF'
     },
     button: {
         backgroundColor: '#080',
         marginTop: 10,
         padding: 10,
         alignItems: 'center',
+        borderRadius: 7
     },
     buttonText: {
         fontFamily: commonStyles.fontFamily,
-        color: '#fff',
+        color: '#FFF',
         fontSize: 20
     }
 })
