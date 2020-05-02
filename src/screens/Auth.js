@@ -8,34 +8,93 @@ import {
     TouchableHighlight,
     Alert
 } from 'react-native'
+import axios from 'axios'
 
 //imports components
 import AuthInput from '../components/AuthInput'
+import {
+    server,
+    showError,
+    showSuccess
+} from '../common'
 
 //imports images, styles and icons
 import commonStyles from '../styles/commonStyles'
+import { relativeTimeThreshold } from 'moment'
 const backgroundImg = require('../../assets/imgs/login.jpg')
+
+const initialState = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    stageNew: false
+}
 
 export default class Auth extends Component {
 
     state = {
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        stageNew: false
+        ...initialState
     }
 
     //metodo de login e cadastro
     signinOrSignup = () => {
         if (this.state.stageNew) {
-            Alert.alert('Sucesso', 'Criar conta!')
+            //Alert.alert('Sucesso', 'Criar conta!')
+            this.signup()
         } else {
-            Alert.alert('Sucesso', 'Logar!')
+            //Alert.alert('Sucesso', 'Logar!')
+            this.signin()
+        }
+    }
+
+    //metodo de signup cadastro
+    signup = async() => {
+        try {
+            await axios.post(`${server}/signup`, {
+                name: this.state.name,
+                email: this.state.email,
+                password: this.state.password,
+                confirmPassword: this.state.confirmPassword,
+            })
+
+            showSuccess('Usuário Cadastrado!')
+            this.setState({
+                ...initialState
+            })
+        } catch(e) {
+            showError(e)
+        }
+    }
+
+    //metodo de login
+    signin = async () => {
+        try {
+            const res = await axios.post(`${server}/signin`, {
+                email: this.state.email,
+                password: this.state.password
+            })
+
+            axios.defaults.headers.common['Authorizations'] = `bearer ${res.data.token}`
+            this.props.navigation.navigate('Home')
+        } catch(e) {
+            showError(e)
         }
     }
 
     render() {
+        const validations = []
+        validations.push(this.state.email && this.state.email.includes('@'))
+        validations.push(this.state.password && this.state.password.length >= 6)
+
+        //se estiver na tela de cadastro
+        if (this.state.stageNew) {
+            validations.push(this.state.name && this.state.name.trim().length >= 3)
+            validations.push(this.state.password === this.state.confirmPassword)
+        }
+
+        const validForm = validations.reduce((t, a) => t && a)
+
         return(
             <ImageBackground
                 source={backgroundImg}
@@ -84,8 +143,9 @@ export default class Auth extends Component {
                         />
                     }
 
-                    <TouchableHighlight onPress={this.signinOrSignup}>
-                        <View style={styles.button}>
+                    <TouchableHighlight onPress={this.signinOrSignup}
+                        disabled={!validForm}>
+                        <View style={[styles.button, validForm ? {} : {backgroundColor: '#aaa'}]}>
                             <Text style={styles.buttonText}>
                                 {this.state.stageNew ? 'Registrar' : 'Entrar'}
                             </Text>
